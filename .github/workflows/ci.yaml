@@ -137,9 +137,9 @@ jobs:
     needs: changes
     outputs:
       golangversion: ${{ steps.golangversion.outputs.version }}
-    if: |
-      (needs.changes.outputs.go == 'true') || (needs.changes.outputs.charts == 'true') || (needs.changes.outputs.baseimage == 'true') || ${{ github.event.workflow_dispatch.run_e2e == 'true' }}
-
+    # Force it for now.
+    # if: |
+    #   (needs.changes.outputs.go == 'true') || (needs.changes.outputs.charts == 'true') || (needs.changes.outputs.baseimage == 'true') || ${{ github.event.workflow_dispatch.run_e2e == 'true' }}
     env:
         PLATFORMS: linux/amd64
     steps:
@@ -181,7 +181,7 @@ jobs:
           needs.changes.outputs.baseimage == 'true'
         run: |
             export TAG=$(cat images/nginx/TAG)
-            cd images/nginx/rootfs && docker buildx build --platform=${{ env.PLATFORMS }} --load -t ghcr.io.io/lsst-sqre/ingress-nginx:${TAG} .
+            cd images/nginx/rootfs && docker buildx build --platform=${{ env.PLATFORMS }} --load -t ghcr.io/lsst-sqre/nginx:${TAG} .
 
       - name: Build images
         env:
@@ -191,7 +191,7 @@ jobs:
         run: |
           echo "building images..."
           export TAGNGINX=$(cat images/nginx/TAG)
-          make BASE_IMAGE=registry.k8s.io/lsst-sqre/ingress-nginx:${TAGNGINX} clean-image build image image-chroot
+          make BASE_IMAGE=ghcr.io/lsst-sqre/nginx:${TAGNGINX} clean-image build image image-chroot
           make -C test/e2e-image image
 
           echo "creating images cache..."
