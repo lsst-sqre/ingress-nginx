@@ -58,7 +58,7 @@ ifneq ($(PLATFORM),)
 	PLATFORM_FLAG="--platform"
 endif
 
-REGISTRY ?= us-central1-docker.pkg.dev/k8s-staging-images/ingress-nginx
+REGISTRY ?= docker.io/lsstsqre
 
 BASE_IMAGE ?= $(shell cat NGINX_BASE)
 
@@ -245,9 +245,9 @@ builder:
 show-version:
 	echo -n $(TAG)
 
-BUILDER ?= ingress-nginx
-PLATFORMS ?= amd64 arm arm64
-BUILDX_PLATFORMS ?= linux/amd64,linux/arm,linux/arm64
+BUILDER ?= lsstsqre
+PLATFORMS ?= amd64 arm64
+BUILDX_PLATFORMS ?= linux/amd64,linux/arm64
 
 .PHONY: release # Build a multi-arch docker image
 release: builder clean
