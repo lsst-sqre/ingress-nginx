@@ -58,7 +58,7 @@ ifneq ($(PLATFORM),)
 	PLATFORM_FLAG="--platform"
 endif
 
-REGISTRY ?= docker.io/lsstsqre
+REGISTRY ?= ghcr.io/lsst-sqre
 
 BASE_IMAGE ?= $(shell cat NGINX_BASE)
 
@@ -245,7 +245,7 @@ builder:
 show-version:
 	echo -n $(TAG)
 
-BUILDER ?= lsstsqre
+BUILDER ?= ingress-nginx
 PLATFORMS ?= amd64 arm64
 BUILDX_PLATFORMS ?= linux/amd64,linux/arm64
 

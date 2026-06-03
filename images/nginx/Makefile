@@ -13,9 +13,8 @@
 # limitations under the License.
 
 BUILDER ?= ingress-nginx
-OWNER ?= ingress-nginx
 PLATFORMS ?= linux/amd64,linux/arm64
-REGISTRY ?= ghcr.io/$(OWNER)
+REGISTRY ?= ghcr.io/lsst-sqre
 IMAGE ?= $(REGISTRY)/nginx
 TAG ?= $(shell cat TAG)
 

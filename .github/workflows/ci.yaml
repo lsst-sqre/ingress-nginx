@@ -139,9 +139,9 @@ jobs:
       golangversion: ${{ steps.golangversion.outputs.version }}
     if: |
       (needs.changes.outputs.go == 'true') || (needs.changes.outputs.charts == 'true') || (needs.changes.outputs.baseimage == 'true') || ${{ github.event.workflow_dispatch.run_e2e == 'true' }}
+
     env:
         PLATFORMS: linux/amd64
-        TAG: 1.0.0-dev
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -187,6 +187,7 @@ jobs:
         env:
           TAG: 1.0.0-dev
           ARCH: amd64
+          REGISTRY: ingress-controller
         run: |
           echo "building images..."
           export TAGNGINX=$(cat images/nginx/TAG)

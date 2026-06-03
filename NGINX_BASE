@@ -1,1 +1,1 @@
-docker.io/lsstsqre/nginx:v0.0.1-dev@sha256:9d1a9751144a3609212812bd7775d217092956c06eced84c2fa2bab76eaa4a82
+ghcr.io/lsst-sqre/nginx:v0.0.1-devsquare
