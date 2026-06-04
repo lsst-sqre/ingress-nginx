@@ -4,8 +4,12 @@ on:
   pull_request:
     branches:
       - "*"
-    paths:
-      - 'images/**'
+  workflow_dispatch:
+    inputs:
+      run_build:
+        description: 'Force build to run'
+        required: false
+        type: boolean
 
 jobs:
   build:
