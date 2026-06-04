@@ -1,10 +1,12 @@
-name: Simple container build
-
+name: ingress-nginx controller build
 on:
+  pull_request:
+    branches:
+      - "*"
   workflow_dispatch:
     inputs:
-      run_build:
-        description: 'Force NGINX build to run'
+      run_controller_build:
+        description: 'Force controller build (only) to run'
         required: false
         type: boolean
 
@@ -16,26 +18,11 @@ jobs:
 
     name: Build
     runs-on: ubuntu-latest
-    outputs:
-      golangversion: ${{ steps.golangversion.outputs.version }}
     env:
         PLATFORMS: linux/amd64,linux/arm64
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-
-      - name: Get go version
-        id: golangversion
-        run: |
-          echo "version=$(cat GOLANG_VERSION)" >> "$GITHUB_OUTPUT"
-
-      - name: Set up Go
-        id: go
-        uses: actions/setup-go@v6
-        with:
-          go-version: ${{ steps.golangversion.outputs.version }}
-          check-latest: true
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
       - name: Set up Docker Buildx
@@ -51,13 +38,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: build-nginx
-        run: |
-          export TAG=$(cat images/nginx/TAG)
-          cd images/nginx/rootfs && docker buildx build --platform=${{ env.PLATFORMS }} --push -t ghcr.io/lsst-sqre/nginx:${TAG} .
-
       - name: build-controller
         run: |
-          echo "building images..."
+          echo "building images (assumes nginx container already built)..."
           export TAGNGINX=$(cat images/nginx/TAG)
           make BASE_IMAGE=ghcr.io/lsst-sqre/nginx:${TAGNGINX} clean-image release
+  
