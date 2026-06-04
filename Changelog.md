@@ -2,10 +2,10 @@
 
 All New change are in [Changelog](./changelog)
 
-### 0.0.1-devsquare
+### 1.5.2-devsquare
 
 * Upgrade NGINX to 1.30.2
-* Only do GitHub Actions build for amd64/arm64 (drop arm(32))
+* Grossly oversimplify GitHub Actions
 * Push images to ghcr.io/lsst-sqre
 
 ### 1.5.1
