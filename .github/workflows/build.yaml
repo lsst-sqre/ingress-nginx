@@ -1,8 +1,30 @@
 name: Build Controller Containers
+# An NGINX base run takes a couple hours, so cancel a running workflow
+# if one is in progress.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   pull_request:
     branches:
       - "*"
+  # No on: push: branches: [main] -- the tagged images will be rebuilt
+  # and tested during the PR iteration process.  The merge is mostly
+  # ceremonial and just sets the baseline for the next PR.
+
+# The idea here is to rebuild the base container (the slow and costly
+# part) if there are changes to it (e.g. a new NGINX version), and if
+# we rebuilt it and the ingress-nginx-controller image depends on the
+# new tag, rebuild that.
+#
+# Otherwise, if the base container already exists, we rebuild the
+# controller if there have been changes affecting it, using the
+# existing base container to do so.
+#
+# Normally, the tag in NGINX_BASE and the tag in images/nginx/TAG should
+# be the same, but there may be times when you want to build a new base
+# container but are not yet ready to rebuild the controller container.
 jobs:
   short_circuit:
     name: "Short circuit check"
@@ -14,9 +36,9 @@ jobs:
       packages: read
     runs-on: ubuntu-latest
     outputs:
-      base_exists: ${{ steps.base_container.exists }}
-      nginx_exists: ${{ steps.nginx.exists }}
-      tags_equal: ${{ steps.tags.tags_equal }}
+      base_exists: ${{ steps.base_container.outputs.exists }}
+      nginx_exists: ${{ steps.nginx.outputs.exists }}
+      tags_equal: ${{ steps.tags.outputs.tags_equal }}
 
     steps:
       - name: Checkout
@@ -25,29 +47,25 @@ jobs:
         id: base_container
         run: |
           set -eux -o pipefail
-          docker pull $(cat NGINX_BASE)
-          rc=$?
-          if  [ ${rc} -ne 0 ]; then
-              echo "exists=false" >> ${GITHUB_OUTPUT}
-          else
+          if docker pull "$(cat NGINX_BASE)" ; then
               echo "exists=true" >> ${GITHUB_OUTPUT}
+          else
+              echo "exists=false" >> ${GITHUB_OUTPUT}
           fi
       - name: nginx
         id: nginx
         run: |
-          set -eux -o pipefail        
-          docker pull ${{ env.REGISTRY }}/nginx:$(cat images/nginx/TAG)
-          rc=$?
-          if  [ ${rc} -ne 0 ]; then
-              echo "exists=false" >> ${GITHUB_OUTPUT}
-          else
+          set -eux -o pipefail
+          if docker pull "${{ env.REGISTRY }}/nginx:$(cat images/nginx/TAG)" ; then
               echo "exists=true" >> ${GITHUB_OUTPUT}
+          else
+              echo "exists=false" >> ${GITHUB_OUTPUT}
           fi
       - name: tags
         id: tags
         run: |
-          set -eux -o pipefail        
-          basetag=$(cat NGINX_BASE | cut -d ':' -f 2)
+          set -eux -o pipefail
+          basetag=$(cat NGINX_BASE | cut -d ':' -f 2-)
           nginxtag=$(cat images/nginx/TAG)
           if [ "${basetag}" == "${nginxtag}" ]; then
               echo "tags_equal=true" >> ${GITHUB_OUTPUT}
@@ -63,6 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       baseimage: ${{ steps.filter.outputs.baseimage }}
+      go: ${{ steps.filter.outputs.go }}
 
     steps:
       - name: Checkout
@@ -75,21 +94,25 @@ jobs:
             baseimage:
               - 'NGINX_BASE'
               - 'images/nginx/**'
-
+            go:
+              - '**/*.go'
+              - 'go.mod'
+              - 'go.sum'
+              - 'rootfs/**/*'
+              - 'TAG'
+              - 'NGINX_BASE'
 
   build_nginx_container:
     name: Build NGINX base container
     needs: [short_circuit, changes]
     if: |
-      (needs.changes.outputs.baseimage == 'true') || ((needs.short_circuit.outputs.nginx_exists == 'false') && (needs.short_circuit.outputs.tags_equal == 'true'))    
+      ((needs.changes.outputs.baseimage == 'true') || (needs.short_circuit.outputs.nginx_exists == 'false'))
     permissions:
       actions: write
       contents: read
       packages: write
       statuses: read
     runs-on: ubuntu-latest
-    outputs:
-      golangversion: ${{ steps.golangversion.outputs.version }}
     env:
       PLATFORMS: linux/amd64,linux/arm64
       REGISTRY: ghcr.io/lsst-sqre
@@ -97,17 +120,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Get go version
-        id: golangversion
-        run: |
-          echo "version=$(cat GOLANG_VERSION)" >> "$GITHUB_OUTPUT"
-
-      - name: Set up Go
-        id: go
-        uses: actions/setup-go@v6
-        with:
-          go-version: ${{ steps.golangversion.outputs.version }}
-          check-latest: true
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
@@ -122,19 +134,18 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: build_nginx
         run: |
+          set -eo pipefail
           export TAG=$(cat images/nginx/TAG)
           cd images/nginx/rootfs && docker buildx build --platform=${{ env.PLATFORMS }} --push -t ${{ env.REGISTRY }}/nginx:${TAG} .
 
   build_dependent_controller_container:
     name: Build ingress-nginx controller (after NGINX base)
     needs: [build_nginx_container, short_circuit]
-    if: |
-      (needs.short_circuit.tags_equal == 'true')
+    if: needs.short_circuit.outputs.tags_equal == 'true'
     runs-on: ubuntu-latest
-    outputs:
-      golangversion: ${{ steps.golangversion.outputs.version }}
     env:
       REGISTRY: "ghcr.io/lsst-sqre"
     permissions:
@@ -161,19 +172,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # No need to set up golang: the make process does that for us.
       - name: build-controller
         run: |
-          echo "building controller images..."
+          echo "building controller images $(cat TAG)..."
           make release
 
   build_independent_controller_container:
     name: Build ingress-nginx controller (only)
-    needs: short_circuit
+    needs: [short_circuit, changes]
     if: |
-      (needs.short_circuit.outputs.base_exists == 'true')
+      ((needs.changes.outputs.go == 'true') && (needs.short_circuit.outputs.base_exists == 'true') && (needs.short_circuit.outputs.nginx_exists == 'true'))
     runs-on: ubuntu-latest
-    outputs:
-      golangversion: ${{ steps.golangversion.outputs.version }}
     env:
       REGISTRY: "ghcr.io/lsst-sqre"
     permissions:
@@ -200,7 +210,8 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # No need to set up golang: the make process does that for us.
       - name: build-controller
         run: |
-          echo "building controller images..."
+          echo "building controller images $(cat TAG)..."
           make release

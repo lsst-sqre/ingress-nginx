@@ -21,9 +21,11 @@ Thus we've decided to rebuild the ingress-nginx controller with a version of NGI
 In addition to the obvious changes to the nginx base image and what repository it lives in, we've done a few other things:
 
  * We dropped almost all of the GitHub Actions, keeping only one that rebuilds the NGINX base container and the controller container.  We are not intending to maintain this package as a going concern.
+ * We updated the GitHub Actions to their current (June 5, 2026) major versions and let them float within that major version.
  * We dropped 32-bit ARM support, leaving only amd64 and arm64 architectures.  Nothing in the Rubin environment that runs Kubernetes will ever need 32-bit ARM.
  * We added instructions for updating to a new version of NGINX, which is the only maintenance action we ever intend to take.
  * We dropped the patch to nginx that had already been addressed upstream.
+ * Note that the controller name is now `ingress-nginx-controller`, not simply `controller`.  That's because `lsst-sqre` supplies other controllers (such as [Nublado](https://nublado.lsst.io)).  You will need to be aware of this when updating your helm charts.
 
 ## How to update NGINX (instructions for Rubin DM SQuaRE)
 
@@ -51,7 +53,7 @@ Make a new branch of this repository (presumably `tickets-DM/something` or `t/DM
 
 Then edit [images/nginx/rootfs/build.sh](images/nginx/rootfs/build.sh).
 Change `NGINX_VERSION` on line 21 to the version you selected.
-Then change the checksum on line 192 (which starts with `get_src`) to the checksum you just extracted.
+Then change the checksum for the NGINX package on line 192 (which starts with `get_src`) to the checksum you just extracted.
 
 Increment the version numbers of the containers.
 [TAG](TAG) holds the controller tag, and [images/nginx/TAG](images/nginx/TAG) holds the NGINX base container tag.
@@ -84,9 +86,9 @@ When everything is finished, `ghcr.io/lsst-sqre/nginx:NGINX_TAG` and `ghcr.io/ls
 
 You have to do all the steps above, but also you're going to need to change `ghcr.io/lsst-sqre` to whatever your container registry is.
 
-[.github/workflows/build.yaml](.github/workflows/build.yaml) contains instances on lines 10 and 95.  Also, if you're not using ghcr.io, you'll need to change the authentication information at lines 119, 157, and 198
+[.github/workflows/build.yaml](.github/workflows/build.yaml) contains two instances of the `REGISTRY` env key with that value.  Also, if you're not using `ghcr.io`, you'll need to change the authentication information in three places, one for each `Login to GitHub Container Registry` step.
 
-Then you'll need to change `REGISTRY` on line 17 of [images/nginx/Makefile](images/nginx/Makefile) and line 61 of [Makefile](Makefile).
+Then you'll need to change the `REGISTRY` definitions in [images/nginx/Makefile](images/nginx/Makefile) and [Makefile](Makefile).
 
 The tags in [TAG](TAG), [images/nginx/TAG](images/nginx/TAG), and [NGINX_BASE](NGINX_BASE) should also probably get a label that is something other than `-devsquare`; likewise for your [Changelog.md](Changelog.md) entry.
 
