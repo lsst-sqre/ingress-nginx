@@ -47,7 +47,7 @@ sha256sum nginx-$NGINX_VERSION.tar.gz | awk '{print $1}'
 
 ### Update files
 
-Make a new branch of this repository (presumably `tickets-DM/something` or `t-DM-something`).
+Make a new branch of this repository (presumably `tickets-DM/something` or `t/DM-something`).
 
 Then edit [images/nginx/rootfs/build.sh](images/nginx/rootfs/build.sh).
 Change `NGINX_VERSION` on line 21 to the version you selected.

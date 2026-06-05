@@ -2,7 +2,7 @@
 
 All New change are in [Changelog](./changelog)
 
-### 1.5.2-devsquare
+### 1.15.2-devsquare
 
 * Upgrade NGINX to 1.30.2
 * Grossly oversimplify GitHub Actions
