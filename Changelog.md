@@ -6,6 +6,7 @@ All New change are in [Changelog](./changelog)
 
 * Upgrade NGINX to 1.30.2
 * Grossly oversimplify GitHub Actions
+* Only build arm64/amd64 (drop arm)
 * Push images to ghcr.io/lsst-sqre
 
 ### 1.5.1
