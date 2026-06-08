@@ -159,6 +159,10 @@ The controller is very quick after the base container is done.
 
 When everything is finished, `ghcr.io/lsst-sqre/nginx:NGINX_TAG` and `ghcr.io/lsst-sqre/ingress-nginx-controller:CONTROLLER_TAG` should both exist, and you can update [Phalanx](https://phalanx.lsst.io) to use the new controller container image.
 
+### Git tidying
+
+Merge your PR, and then create and push a git tag with the new value in [TAG](tag).
+
 ## How to update if you're not Rubin DM SQuaRE
 
 You have to do all the steps above, but also you're going to need to change `ghcr.io/lsst-sqre` to whatever your container registry is.
