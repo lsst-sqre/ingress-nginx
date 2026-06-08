@@ -47,11 +47,95 @@ wget https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz
 sha256sum nginx-$NGINX_VERSION.tar.gz | awk '{print $1}'
 ```
 
+### Get your patch set working
+
+#### Set up quilt, sources, and patches
+
+First, acquire quilt; it is very probably in whatever package manager you're using.
+
+Second, grab a fresh copy of NGINX from [https://nginx.org/downloads](https://nginx.org/downloads).
+
+Unpack the vanilla NGINX sources.
+
+Copy the `patches` subdirectory from [images/nginx/rootfs/patches](images/nginx/rootfs/patches) into the top-level NGINX source directory.
+
+#### Try patching, in dry-run mode
+
+Change directory into the top-level NGINX source directory.
+Try applying patches:
+
+```bash
+for p in patches/*; do patch --dry-run -p1 < ${p}; done
+```
+
+Ignore anything that patches with a fuzz offset; that is fine and we will get to it in the next step.
+What you are concerned with are patches that are rejected.
+
+For each of these, see what went wrong.
+The best case is that it's a patch that has already been incorporated upstream, in which case you can just delete it.
+Otherwise, you're going to have to put in some work to determine why it failed and how to make it work.
+
+Eventually, however, you will either have removed all patches that failed to apply, or gotten them to apply, possibly with fuzz.
+
+Now it's time to rebase the patch set to eliminate the fuzz.
+
+#### Rebase the patch set
+
+Create a series file from the existing patches: `cd patches && quilt import *`.
+
+Now do the rebase:
+
+```bash
+quilt pop -a
+while quilt push; do quilt refresh -p ab; done
+```
+
+This will create (assuming that the patches all applied, which they should have if you did the iterative process above) modified patch files, and backup patch files with `~` extensions.
+
+
+#### Tidy up
+
+Remove all your backup files and the quilt series file: `rm series *~`
+
+Rename the patches so they have the current NGINX version.
+For instance if you are moving from version 1.27.1 to 1.30.2, do:
+```bash
+OLD=1.27.1
+NEW=1.30.2
+for p in $(ls *-${OLD}-*.patch); do n=$(echo $p | sed -e "s/${OLD}/${NEW}/"); mv ${p} ${n}; done
+```
+
+#### Test patch application
+
+Make sure all patches apply cleanly.
+Unpack the vanilla NGINX tarball somewhere new, cd to it, and copy your patch directory over to it.
+Then apply all the patches.
+```bash
+mkdir path-to-test-nginx
+cd path-to-test-nginx
+tar xvpfz path-to-tarball.tgz
+cd nginx-${NEW}
+cp -a path-to-patching-nginx/patches .
+for p in patches/*.patch; do patch -p1 < ${p}; done
+```
+
+This should apply cleanly.  If it does, move on to updating the patches in the ingress-nginx git repository.  If not, work on the patch set until it does.
+
+#### Update patches in ingress-nginx
+
+Make a new branch of this repository (if you're part of DM SQuaRE, presumably `tickets-DM/something` or `t/DM-something`).
+
+Go back to [images/nginx/rootfs](images/nginx/rootfs) and remove the extant patchset: `git rm -rf patches`.
+
+Copy the rebased patches into place and add them to git: `cp -a path-to-nginx-src/patches . && git add patches`.
+
+Commit the changes: `git commit -m "Rebase patch set"`
+
+Now it's time to fix up the rest of the build process.
+
 ### Update files
 
-Make a new branch of this repository (presumably `tickets-DM/something` or `t/DM-something`).
-
-Then edit [images/nginx/rootfs/build.sh](images/nginx/rootfs/build.sh).
+Edit [images/nginx/rootfs/build.sh](images/nginx/rootfs/build.sh).
 Change `NGINX_VERSION` on line 21 to the version you selected.
 Then change the checksum for the NGINX package on line 192 (which starts with `get_src`) to the checksum you just extracted.
 
@@ -71,16 +155,13 @@ GitHub Actions will do the base container build and the controller build.
 It takes about two hours to rebuild the base container.
 The controller is very quick after the base container is done.
 
-Keep an eye on the base container build.
-Depending on how extensive the changes to NGINX have been, you may have to regenerate or drop patches, which are found in [images/nginx/rootfs/patches](images/nginx/rootfs/patches).
-
-### Iterate and repeat as necessary
-
-Once all the patches apply (or you've confirmed they are no longer needed), then you're ready to move on.
-
 ### After the build
 
 When everything is finished, `ghcr.io/lsst-sqre/nginx:NGINX_TAG` and `ghcr.io/lsst-sqre/ingress-nginx-controller:CONTROLLER_TAG` should both exist, and you can update [Phalanx](https://phalanx.lsst.io) to use the new controller container image.
+
+### Git tidying
+
+Merge your PR, and then create and push a git tag with the new value in [TAG](tag).
 
 ## How to update if you're not Rubin DM SQuaRE
 

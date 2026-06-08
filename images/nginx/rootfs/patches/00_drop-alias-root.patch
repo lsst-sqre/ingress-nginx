@@ -1,9 +1,9 @@
 :100644 100644 c7463dcd 00000000 M	src/http/ngx_http_core_module.c
-diff --git a/src/http/ngx_http_core_module.c b/src/http/ngx_http_core_module.c
-index c7463dcd..e2e45931 100644
+Index: b/src/http/ngx_http_core_module.c
+===================================================================
 --- a/src/http/ngx_http_core_module.c
 +++ b/src/http/ngx_http_core_module.c
-@@ -55,7 +55,6 @@ static char *ngx_http_core_listen(ngx_conf_t *cf, ngx_command_t *cmd,
+@@ -55,7 +55,6 @@ static char *ngx_http_core_listen(ngx_co
      void *conf);
  static char *ngx_http_core_server_name(ngx_conf_t *cf, ngx_command_t *cmd,
      void *conf);
@@ -11,7 +11,7 @@ index c7463dcd..e2e45931 100644
  static char *ngx_http_core_limit_except(ngx_conf_t *cf, ngx_command_t *cmd,
      void *conf);
  static char *ngx_http_core_set_aio(ngx_conf_t *cf, ngx_command_t *cmd,
-@@ -323,21 +322,6 @@ static ngx_command_t  ngx_http_core_commands[] = {
+@@ -330,21 +329,6 @@ static ngx_command_t  ngx_http_core_comm
        offsetof(ngx_http_core_loc_conf_t, default_type),
        NULL },
  
@@ -33,10 +33,13 @@ index c7463dcd..e2e45931 100644
      { ngx_string("limit_except"),
        NGX_HTTP_LOC_CONF|NGX_CONF_BLOCK|NGX_CONF_1MORE,
        ngx_http_core_limit_except,
-@@ -4312,108 +4296,6 @@ ngx_http_core_server_name(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
- }
+@@ -4567,108 +4551,6 @@ ngx_http_core_server_name(ngx_conf_t *cf
+     }
  
- 
+     return NGX_CONF_OK;
+-}
+-
+-
 -static char *
 -ngx_http_core_root(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 -{
@@ -136,9 +139,6 @@ index c7463dcd..e2e45931 100644
 -    }
 -
 -    return NGX_CONF_OK;
--}
--
--
- static ngx_http_method_name_t  ngx_methods_names[] = {
-     { (u_char *) "GET",       (uint32_t) ~NGX_HTTP_GET },
-     { (u_char *) "HEAD",      (uint32_t) ~NGX_HTTP_HEAD },
+ }
+ 
+ 
