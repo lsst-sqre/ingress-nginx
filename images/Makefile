@@ -15,8 +15,8 @@
 NAME ?=
 
 BUILDER ?= ingress-nginx
-PLATFORMS ?= linux/amd64,linux/arm,linux/arm64
-REGISTRY ?= us-central1-docker.pkg.dev/k8s-staging-images/ingress-nginx
+PLATFORMS ?= linux/amd64,linux/arm64
+REGISTRY ?= ghcr.io/lsst-sqre
 IMAGE ?= $(REGISTRY)/$(NAME)
 TAG ?= $(shell cat $(NAME)/TAG)
 
@@ -35,8 +35,8 @@ build: builder
 	docker buildx build \
 		--builder $(BUILDER) \
 		--platform $(PLATFORMS) \
-		--label org.opencontainers.image.description="Ingress NGINX $(NAME)" \
-		--label org.opencontainers.image.source="https://github.com/kubernetes/ingress-nginx" \
+		--label org.opencontainers.image.description="Ingress NGINX $(NAME) (SQuaRE build)" \
+		--label org.opencontainers.image.source="https://github.com/lsst-sqre/ingress-nginx" \
 		--label org.opencontainers.image.licenses="Apache-2.0" \
 		--build-arg BASE_IMAGE=$(BASE_IMAGE) \
 		--build-arg GOLANG_VERSION=$(GOLANG_VERSION) \

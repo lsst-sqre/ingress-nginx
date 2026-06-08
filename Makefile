@@ -58,7 +58,7 @@ ifneq ($(PLATFORM),)
 	PLATFORM_FLAG="--platform"
 endif
 
-REGISTRY ?= us-central1-docker.pkg.dev/k8s-staging-images/ingress-nginx
+REGISTRY ?= ghcr.io/lsst-sqre
 
 BASE_IMAGE ?= $(shell cat NGINX_BASE)
 
@@ -246,8 +246,8 @@ show-version:
 	echo -n $(TAG)
 
 BUILDER ?= ingress-nginx
-PLATFORMS ?= amd64 arm arm64
-BUILDX_PLATFORMS ?= linux/amd64,linux/arm,linux/arm64
+PLATFORMS ?= amd64 arm64
+BUILDX_PLATFORMS ?= linux/amd64,linux/arm64
 
 .PHONY: release # Build a multi-arch docker image
 release: builder clean
@@ -267,7 +267,7 @@ release: builder clean
 		--build-arg VERSION="$(TAG)" \
 		--build-arg COMMIT_SHA="$(COMMIT_SHA)" \
 		--build-arg BUILD_ID="$(BUILD_ID)" \
-		-t $(REGISTRY)/controller:$(TAG) rootfs
+		-t $(REGISTRY)/ingress-nginx-controller:$(TAG) rootfs
 
 	docker buildx build \
 		--no-cache \
@@ -280,7 +280,7 @@ release: builder clean
 		--build-arg VERSION="$(TAG)" \
 		--build-arg COMMIT_SHA="$(COMMIT_SHA)" \
 		--build-arg BUILD_ID="$(BUILD_ID)" \
-		-t $(REGISTRY)/controller-chroot:$(TAG) rootfs -f rootfs/Dockerfile-chroot
+		-t $(REGISTRY)/ingress-nginx-controller-chroot:$(TAG) rootfs -f rootfs/Dockerfile-chroot
 
 .PHONY: build-docs
 build-docs:
