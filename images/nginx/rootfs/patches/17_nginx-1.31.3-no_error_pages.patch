@@ -26,7 +26,7 @@ Index: b/src/http/ngx_http_core_module.c
      { ngx_string("post_action"),
        NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                          |NGX_CONF_TAKE1,
-@@ -3611,7 +3621,6 @@ ngx_http_core_create_loc_conf(ngx_conf_t
+@@ -3637,7 +3647,6 @@ ngx_http_core_create_loc_conf(ngx_conf_t
       *     clcf->types = NULL;
       *     clcf->default_type = { 0, NULL };
       *     clcf->error_log = NULL;
@@ -34,7 +34,7 @@ Index: b/src/http/ngx_http_core_module.c
       *     clcf->client_body_path = NULL;
       *     clcf->regex = NULL;
       *     clcf->exact_match = 0;
-@@ -3621,6 +3630,7 @@ ngx_http_core_create_loc_conf(ngx_conf_t
+@@ -3647,6 +3656,7 @@ ngx_http_core_create_loc_conf(ngx_conf_t
       *     clcf->keepalive_disable = 0;
       */
  
@@ -42,7 +42,7 @@ Index: b/src/http/ngx_http_core_module.c
      clcf->client_max_body_size = NGX_CONF_UNSET;
      clcf->client_body_buffer_size = NGX_CONF_UNSET_SIZE;
      clcf->client_body_timeout = NGX_CONF_UNSET_MSEC;
-@@ -3825,9 +3835,7 @@ ngx_http_core_merge_loc_conf(ngx_conf_t
+@@ -3851,9 +3861,7 @@ ngx_http_core_merge_loc_conf(ngx_conf_t
          }
      }
  
@@ -53,7 +53,7 @@ Index: b/src/http/ngx_http_core_module.c
  
      ngx_conf_merge_str_value(conf->default_type,
                                prev->default_type, "text/plain");
-@@ -4811,6 +4819,10 @@ ngx_http_core_error_page(ngx_conf_t *cf,
+@@ -4837,6 +4845,10 @@ ngx_http_core_error_page(ngx_conf_t *cf,
      ngx_http_compile_complex_value_t   ccv;
  
      if (clcf->error_pages == NULL) {
@@ -64,7 +64,7 @@ Index: b/src/http/ngx_http_core_module.c
          clcf->error_pages = ngx_array_create(cf->pool, 4,
                                               sizeof(ngx_http_err_page_t));
          if (clcf->error_pages == NULL) {
-@@ -4914,6 +4926,25 @@ ngx_http_core_error_page(ngx_conf_t *cf,
+@@ -4940,6 +4952,25 @@ ngx_http_core_error_page(ngx_conf_t *cf,
  
      return NGX_CONF_OK;
  }

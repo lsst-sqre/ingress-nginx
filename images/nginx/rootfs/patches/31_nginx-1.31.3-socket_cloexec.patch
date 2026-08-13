@@ -131,7 +131,7 @@ Index: b/src/event/ngx_event_connect.c
      ngx_log_debug2(NGX_LOG_DEBUG_EVENT, pc->log, 0, "%s socket %d",
                     (type == SOCK_STREAM) ? "stream" : "dgram", s);
  
-@@ -92,6 +99,15 @@ ngx_event_connect_peer(ngx_peer_connecti
+@@ -104,6 +111,15 @@ ngx_event_connect_peer(ngx_peer_connecti
          goto failed;
      }
  

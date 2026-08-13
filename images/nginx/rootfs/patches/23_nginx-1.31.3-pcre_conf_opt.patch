@@ -9,7 +9,7 @@ Index: b/auto/options
 ===================================================================
 --- a/auto/options
 +++ b/auto/options
-@@ -370,6 +370,7 @@ use the \"--with-mail_ssl_module\" optio
+@@ -384,6 +384,7 @@ use the \"--with-mail_ssl_module\" optio
          --with-pcre)                     USE_PCRE=YES               ;;
          --with-pcre=*)                   PCRE="$value"              ;;
          --with-pcre-opt=*)               PCRE_OPT="$value"          ;;
@@ -17,7 +17,7 @@ Index: b/auto/options
          --with-pcre-jit)                 PCRE_JIT=YES               ;;
          --without-pcre2)                 PCRE2=DISABLED             ;;
  
-@@ -592,6 +593,7 @@ cat << END
+@@ -612,6 +613,7 @@ cat << END
    --with-pcre                        force PCRE library usage
    --with-pcre=DIR                    set path to PCRE library sources
    --with-pcre-opt=OPTIONS            set additional build options for PCRE

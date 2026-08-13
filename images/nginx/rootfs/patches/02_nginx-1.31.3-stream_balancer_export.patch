@@ -13,7 +13,7 @@ Index: b/src/stream/ngx_stream_upstream_round_robin.c
  static ngx_int_t ngx_stream_upstream_empty_set_session(
      ngx_peer_connection_t *pc, void *data);
  static void ngx_stream_upstream_empty_save_session(ngx_peer_connection_t *pc,
-@@ -898,7 +894,7 @@ ngx_stream_upstream_notify_round_robin_p
+@@ -933,7 +929,7 @@ ngx_stream_upstream_notify_round_robin_p
  
  #if (NGX_STREAM_SSL)
  
@@ -22,7 +22,7 @@ Index: b/src/stream/ngx_stream_upstream_round_robin.c
  ngx_stream_upstream_set_round_robin_peer_session(ngx_peer_connection_t *pc,
      void *data)
  {
-@@ -960,7 +956,7 @@ ngx_stream_upstream_set_round_robin_peer
+@@ -995,7 +991,7 @@ ngx_stream_upstream_set_round_robin_peer
  }
  
  
@@ -35,9 +35,9 @@ Index: b/src/stream/ngx_stream_upstream_round_robin.h
 ===================================================================
 --- a/src/stream/ngx_stream_upstream_round_robin.h
 +++ b/src/stream/ngx_stream_upstream_round_robin.h
-@@ -228,5 +228,15 @@ ngx_int_t ngx_stream_upstream_get_round_
- void ngx_stream_upstream_free_round_robin_peer(ngx_peer_connection_t *pc,
-     void *data, ngx_uint_t state);
+@@ -226,6 +226,16 @@ typedef struct {
+     uintptr_t                        data;
+ } ngx_stream_upstream_rr_peer_data_t;
  
 +#if (NGX_STREAM_SSL)
 +ngx_int_t ngx_stream_upstream_set_round_robin_peer_session(
@@ -50,4 +50,5 @@ Index: b/src/stream/ngx_stream_upstream_round_robin.h
 +#define HAVE_NGX_STREAM_BALANCER_EXPORT_PATCH 1
 +
  
- #endif /* _NGX_STREAM_UPSTREAM_ROUND_ROBIN_H_INCLUDED_ */
+ /* exponential moving average + rounding */
+ #define ngx_stream_upstream_response_time_avg(avg, v)                          \

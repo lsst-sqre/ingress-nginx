@@ -2,7 +2,7 @@ Index: b/src/http/ngx_http_upstream.c
 ===================================================================
 --- a/src/http/ngx_http_upstream.c
 +++ b/src/http/ngx_http_upstream.c
-@@ -1592,6 +1592,11 @@ ngx_http_upstream_connect(ngx_http_reque
+@@ -1606,6 +1606,11 @@ ngx_http_upstream_connect(ngx_http_reque
          return;
      }
  
@@ -18,7 +18,7 @@ Index: b/src/http/ngx_http_upstream.h
 ===================================================================
 --- a/src/http/ngx_http_upstream.h
 +++ b/src/http/ngx_http_upstream.h
-@@ -461,4 +461,9 @@ extern ngx_conf_bitmask_t  ngx_http_upst
+@@ -464,4 +464,9 @@ extern ngx_conf_bitmask_t  ngx_http_upst
  extern ngx_conf_bitmask_t  ngx_http_upstream_ignore_headers_masks[];
  
  
@@ -44,7 +44,7 @@ Index: b/src/stream/ngx_stream_proxy_module.c
 ===================================================================
 --- a/src/stream/ngx_stream_proxy_module.c
 +++ b/src/stream/ngx_stream_proxy_module.c
-@@ -769,6 +769,11 @@ ngx_stream_proxy_connect(ngx_stream_sess
+@@ -804,6 +804,11 @@ ngx_stream_proxy_connect(ngx_stream_sess
          return;
      }
  
@@ -60,7 +60,7 @@ Index: b/src/stream/ngx_stream_upstream.h
 ===================================================================
 --- a/src/stream/ngx_stream_upstream.h
 +++ b/src/stream/ngx_stream_upstream.h
-@@ -162,4 +162,9 @@ ngx_stream_upstream_srv_conf_t *ngx_stre
+@@ -163,4 +163,9 @@ ngx_stream_upstream_srv_conf_t *ngx_stre
  extern ngx_module_t  ngx_stream_upstream_module;
  
  
