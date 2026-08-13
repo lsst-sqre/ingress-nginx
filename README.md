@@ -25,6 +25,7 @@ In addition to the obvious changes to the nginx base image and what repository i
  * We dropped 32-bit ARM support, leaving only amd64 and arm64 architectures.  Nothing in the Rubin environment that runs Kubernetes will ever need 32-bit ARM.
  * We added instructions for updating to a new version of NGINX, which is the only maintenance action we ever intend to take.
  * We dropped the patch to nginx that had already been addressed upstream.
+ * The `log_escape_non_ascii` patch needed rework to fit an updated source file.
  * Note that the controller name is now `ingress-nginx-controller`, not simply `controller`.  That's because `lsst-sqre` supplies other controllers (such as [Nublado](https://nublado.lsst.io)).  You will need to be aware of this when updating your helm charts.
 
 ## How to update NGINX (instructions for Rubin DM SQuaRE)
@@ -42,12 +43,18 @@ Once you've done that, you should get its sha256sum.
 Do something like the following:
 
 ```bash
-NGINX_VERSION=1.30.2
+NGINX_VERSION=1.31.3
 wget https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz
 sha256sum nginx-$NGINX_VERSION.tar.gz | awk '{print $1}'
 ```
 
 ### Get your patch set working
+
+#### Set up an environment
+
+You probably want to do this on Linux rather than MacOS, or, God forbid, Windows.
+An EC2 instance is a quick and easy way to get a very basic Linux machine going.
+Note that `quilt` is not available for EC2 Linux; I used a Debian image instead.
 
 #### Set up quilt, sources, and patches
 
@@ -65,7 +72,7 @@ Change directory into the top-level NGINX source directory.
 Try applying patches:
 
 ```bash
-for p in patches/*; do patch --dry-run -p1 < ${p}; done
+for p in patches/*; do echo "*** ${p} ***"; patch --dry-run -p1 < ${p}; done
 ```
 
 Ignore anything that patches with a fuzz offset; that is fine and we will get to it in the next step.
@@ -75,7 +82,9 @@ For each of these, see what went wrong.
 The best case is that it's a patch that has already been incorporated upstream, in which case you can just delete it.
 Otherwise, you're going to have to put in some work to determine why it failed and how to make it work.
 
-Eventually, however, you will either have removed all patches that failed to apply, or gotten them to apply, possibly with fuzz.
+A common case is that a later patch depends on an earlier patch; in that case you may need to make a working copy of the repository, and actually apply the patches in sequence to be able to tell what works and what does not.
+
+Eventually, you will either have removed all patches that failed to apply, or gotten them to apply, possibly with fuzz.
 
 Now it's time to rebase the patch set to eliminate the fuzz.
 
@@ -98,10 +107,10 @@ This will create (assuming that the patches all applied, which they should have 
 Remove all your backup files and the quilt series file: `rm series *~`
 
 Rename the patches so they have the current NGINX version.
-For instance if you are moving from version 1.27.1 to 1.30.2, do:
+For instance if you are moving from version 1.30.2 to 1.31.3, do:
 ```bash
-OLD=1.27.1
-NEW=1.30.2
+OLD=1.30.2
+NEW=1.31.3
 for p in $(ls *-${OLD}-*.patch); do n=$(echo $p | sed -e "s/${OLD}/${NEW}/"); mv ${p} ${n}; done
 ```
 
@@ -176,5 +185,5 @@ The tags in [TAG](TAG), [images/nginx/TAG](images/nginx/TAG), and [NGINX_BASE](N
 ## Conclusion
 
 This kicks the can down the road a little farther.
-It's currently June 5, 2026.
+It's currently August 13, 2026.
 Let's see how long it takes us to move away from ingress-nginx entirely.
