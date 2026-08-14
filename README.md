@@ -43,7 +43,7 @@ Once you've done that, you should get its sha256sum.
 Do something like the following:
 
 ```bash
-NGINX_VERSION=1.31.3
+NGINX_VERSION=1.30.4
 wget https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz
 sha256sum nginx-$NGINX_VERSION.tar.gz | awk '{print $1}'
 ```
@@ -107,10 +107,10 @@ This will create (assuming that the patches all applied, which they should have 
 Remove all your backup files and the quilt series file: `rm series *~`
 
 Rename the patches so they have the current NGINX version.
-For instance if you are moving from version 1.30.2 to 1.31.3, do:
+For instance if you are moving from version 1.30.2 to 1.30.4, do:
 ```bash
 OLD=1.30.2
-NEW=1.31.3
+NEW=1.30.4
 for p in $(ls *-${OLD}-*.patch); do n=$(echo $p | sed -e "s/${OLD}/${NEW}/"); mv ${p} ${n}; done
 ```
 
