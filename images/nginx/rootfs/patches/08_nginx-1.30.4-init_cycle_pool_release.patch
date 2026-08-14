@@ -23,7 +23,7 @@ Index: b/src/core/ngx_core.h
 ===================================================================
 --- a/src/core/ngx_core.h
 +++ b/src/core/ngx_core.h
-@@ -119,4 +119,6 @@ void ngx_cpuinfo(void);
+@@ -118,4 +118,6 @@ void ngx_cpuinfo(void);
  #define NGX_DISABLE_SYMLINKS_NOTOWNER   2
  #endif
  
@@ -34,7 +34,7 @@ Index: b/src/core/ngx_cycle.c
 ===================================================================
 --- a/src/core/ngx_cycle.c
 +++ b/src/core/ngx_cycle.c
-@@ -782,6 +782,10 @@ old_shm_zone_done:
+@@ -780,6 +780,10 @@ old_shm_zone_done:
  
      if (ngx_process == NGX_PROCESS_MASTER || ngx_is_init_cycle(old_cycle)) {
  

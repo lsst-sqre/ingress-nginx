@@ -12,7 +12,7 @@ Index: b/src/http/ngx_http_upstream.c
 ===================================================================
 --- a/src/http/ngx_http_upstream.c
 +++ b/src/http/ngx_http_upstream.c
-@@ -2426,7 +2426,7 @@ ngx_http_upstream_send_request_handler(n
+@@ -2407,7 +2407,7 @@ ngx_http_upstream_send_request_handler(n
  
  #endif
  

@@ -2,7 +2,7 @@ Index: b/src/core/ngx_cycle.c
 ===================================================================
 --- a/src/core/ngx_cycle.c
 +++ b/src/core/ngx_cycle.c
-@@ -266,6 +266,9 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
+@@ -264,6 +264,9 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
      }
  
  

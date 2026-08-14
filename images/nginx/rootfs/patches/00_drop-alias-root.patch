@@ -33,7 +33,7 @@ Index: b/src/http/ngx_http_core_module.c
      { ngx_string("limit_except"),
        NGX_HTTP_LOC_CONF|NGX_CONF_BLOCK|NGX_CONF_1MORE,
        ngx_http_core_limit_except,
-@@ -4593,108 +4577,6 @@ ngx_http_core_server_name(ngx_conf_t *cf
+@@ -4567,108 +4551,6 @@ ngx_http_core_server_name(ngx_conf_t *cf
      }
  
      return NGX_CONF_OK;
