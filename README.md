@@ -1,5 +1,14 @@
 # ingress-nginx (Rubin Observatory DM-SQuaRE fork)
 
+
+## DO NOT USE THIS
+
+Try https://github.com/lsst-sqre/ingress-nginx-chainguard instead.
+
+We will only revive this if Chainguard stops maintaining ingress-nginx before we can move to the Gateway API.
+
+Everything below here is only for its historical curiosity.
+
 ## USE AT YOUR OWN RISK
 
 We're not ingress-nginx maintainers, and we are not qualified to be.
