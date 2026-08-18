@@ -2,6 +2,10 @@
 
 All New change are in [Changelog](./changelog)
 
+### 1.15.3-devsquare
+
+* Upgrade NGINX to 1.30.4
+
 ### 1.15.2-devsquare
 
 * Upgrade NGINX to 1.30.2
